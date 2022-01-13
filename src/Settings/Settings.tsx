@@ -1,6 +1,7 @@
 import React, {ChangeEvent} from 'react';
-import SuperButton from '../SuperButton/SuperButton';
+
 import './Settings.css';
+import SuperButton from "../SuperButton/SuperButton";
 
 type SettingsPropsType = {
     maxValue: number

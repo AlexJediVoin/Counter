@@ -6,85 +6,105 @@ import Display from "./Display/Display";
 
 function App() {
 
-    let [maxValue, SetMaxValue] = useState<number>(10);
-    let [startValue, SetStartValue] = useState<number>(0);
-    let [counter, SetCounter] = useState<number>(startValue);
-    let [counterStyle, SetCounterStyle] = useState<boolean>(false);
-    let [error, SetError] = useState<boolean>(false);
-    let [flag, SetFlag] = useState<boolean>(false);
-    let [flagMaxValue, SetFlagMaxValue] = useState<boolean>(false);
+    let [maxValue, setMaxValue] = useState<number>(10);
+    let [startValue, setStartValue] = useState<number>(0);
+    let [counter, setCounter] = useState<number>(startValue);
+    let [counterStyle, setCounterStyle] = useState<boolean>(false);
+    let [error, setError] = useState<boolean>(false);
+    let [flag, setFlag] = useState<boolean>(false);
+    let [flagMaxValue, setFlagMaxValue] = useState<boolean>(false);
 
 
-    let [disableSetBtn, SetDisableSetBtn] = useState<boolean>(false);
-    let [disableIncBtn, SetDisableIncBtn] = useState<boolean>(false);
+    let [disableSetBtn, setDisableSetBtn] = useState<boolean>(false);
+    let [disableIncBtn, setDisableIncBtn] = useState<boolean>(false);
     let [disableResetBtn, SetDisableResetBtn] = useState<boolean>(false);
+
+    const setToLocalStorageHandler = () => {
+        localStorage.setItem('startValue', JSON.stringify(startValue));
+        localStorage.setItem('maxValue', JSON.stringify(maxValue));
+    }
+    const getFromLocalStorageHandler = () => {
+        let valueStartAsString = localStorage.getItem('startValue');
+        let valueMaxAsString = localStorage.getItem('maxValue');
+        if (valueStartAsString) {
+            let newStartValue = JSON.parse(valueStartAsString);
+            setStartValue(newStartValue);
+        }
+        if (valueMaxAsString) {
+            let newMaxValue = JSON.parse(valueMaxAsString);
+            setStartValue(newMaxValue);
+        }
+    }
 
     const onChangeMaxValue = (maxValue: number) => {
         if (maxValue <= startValue) {
-            SetFlagMaxValue(true);
-            SetDisableSetBtn(true);
-            SetMaxValue(maxValue)
+            setFlagMaxValue(true);
+            setDisableSetBtn(true);
+            setMaxValue(maxValue)
             return
         } else if (maxValue > startValue) {
-            SetFlag(true);
-            SetFlagMaxValue(false);
+            setFlag(true);
+            setFlagMaxValue(false);
         }
-        SetMaxValue(maxValue)
-        SetDisableSetBtn(false);
+        setMaxValue(maxValue)
+        setDisableSetBtn(false);
     }
     const onChangeStartValue = (startValue: number) => {
         if (startValue >= maxValue) {
-            SetFlagMaxValue(true);
-            SetStartValue(startValue);
-            SetDisableSetBtn(true);
+            setFlagMaxValue(true);
+            setStartValue(startValue);
+            setDisableSetBtn(true);
             return
-        }
-        else {
-            SetFlagMaxValue(false);
+        } else {
+            setFlagMaxValue(false);
         }
         if (startValue < 0) {
-            SetError(true);
-            SetFlagMaxValue(true);
-            SetStartValue(startValue);
-            SetDisableSetBtn(true);
+            setError(true);
+            setFlagMaxValue(true);
+            setStartValue(startValue);
+            setDisableSetBtn(true);
             return
         } else if (startValue >= 0) {
             if (!error) {
-                SetStartValue(startValue);
-                SetDisableSetBtn(false);
+                setStartValue(startValue);
+                setDisableSetBtn(false);
                 return
             }
-            SetError(false);
+            setError(false);
         }
-        SetStartValue(startValue);
-        SetDisableSetBtn(false);
+        setStartValue(startValue);
+        setDisableSetBtn(false);
     }
 
     const onClickSetBtn = () => {
-        SetFlag(false);
-        SetFlagMaxValue(false);
-        SetDisableSetBtn(true);
-        SetCounter(startValue);
+        setToLocalStorageHandler();
+        getFromLocalStorageHandler();
+        setFlag(false);
+        setFlagMaxValue(false);
+        setDisableSetBtn(true);
+        setCounter(startValue);
     }
     const onClickResetBtn = () => {
-        SetDisableSetBtn(false);
-        SetDisableIncBtn(false);
-        SetCounterStyle(false);
-        SetCounter(startValue);
+        setDisableSetBtn(false);
+        setDisableIncBtn(false);
+        setCounterStyle(false);
+        setCounter(startValue);
     }
 
     const onClickIncBtn = () => {
         if (counter < maxValue) {
             counter++;
             if (counter === maxValue) {
-                SetDisableIncBtn(true);
-                SetCounterStyle(true);
-            } else {SetCounterStyle(false)}
-            SetCounter(counter);
+                setDisableIncBtn(true);
+                setCounterStyle(true);
+            } else {
+                setCounterStyle(false)
+            }
+            setCounter(counter);
         }
     }
     const onChangeFlag = (flag: boolean) => {
-       SetFlag(flag);
+        setFlag(flag);
     }
     return (
         <div className="App">
