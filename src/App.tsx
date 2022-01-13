@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 import Settings from "./Settings/Settings";
 import Display from "./Display/Display";
@@ -32,7 +32,7 @@ function App() {
         }
         if (valueMaxAsString) {
             let newMaxValue = JSON.parse(valueMaxAsString);
-            setStartValue(newMaxValue);
+            setMaxValue(newMaxValue);
         }
     }
 
@@ -78,7 +78,6 @@ function App() {
 
     const onClickSetBtn = () => {
         setToLocalStorageHandler();
-        getFromLocalStorageHandler();
         setFlag(false);
         setFlagMaxValue(false);
         setDisableSetBtn(true);
@@ -106,6 +105,10 @@ function App() {
     const onChangeFlag = (flag: boolean) => {
         setFlag(flag);
     }
+
+    useEffect(() => {
+        getFromLocalStorageHandler()
+    },[])
     return (
         <div className="App">
             <Settings maxValue={maxValue}

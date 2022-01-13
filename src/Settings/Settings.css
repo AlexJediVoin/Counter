@@ -31,8 +31,8 @@
     border: 3px solid aqua;
     border-radius: 3%;
 }
-max_value {
-    margin-right: 50px;
+.max_value, .start_value {
+    padding-right: 50px;
 }
 input[type=number] {
     width: 80px;

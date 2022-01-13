@@ -33,7 +33,7 @@ function Settings(props:SettingsPropsType) {
                         <input type="number" value={props.maxValue} onChange={onChangeMaxValue}/>
                     </div>
                     <div>
-                        <span>start value:</span>
+                        <span className={"start_value"}>start value:</span>
                         <input type="number" className={props.error ? "error" : ""} value={props.startValue} onChange={onChangeStartValue}/>
                     </div>
                 </div>
