@@ -8,7 +8,6 @@ type SuperButtonPropsType = {
 }
 
 
-
 function SuperButton(props: SuperButtonPropsType) {
 
     const OnClickHandler = () => {
