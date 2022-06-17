@@ -119,8 +119,8 @@ function App() {
     }, [dispatch])
 
     useEffect(() => {
-            getFromLocalStorageHandler();
-    })
+        getFromLocalStorageHandler();
+    },[])
     return (
         <div className={styles.App}>
             <Settings maxValue={settingsState.maxValue}
