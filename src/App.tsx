@@ -1,132 +1,144 @@
-import React, {useEffect, useState} from 'react';
-import './App.css';
+import React, {useCallback, useEffect} from 'react';
+import styles from './App.module.css';
 import Settings from "./Settings/Settings";
 import Display from "./Display/Display";
-
+import {useDispatch, useSelector} from "react-redux";
+import {AppStateType} from "./Redux/store";
+import {
+    disabledSetBtnAC,
+    setErrorAC,
+    setMaxValueAC,
+    setStartValueAC,
+    settingsStateType
+} from "./Redux/settings-reducer";
+import {
+    displayStateType,
+    setCounterAC, setCounterStyleAC,
+    setDisableIncBtnAC, setDisableResetBtnAC,
+    setFlagAC,
+    setFlagMaxValueAC
+} from './Redux/display-reducer';
 
 function App() {
 
-    let [maxValue, setMaxValue] = useState<number>(10);
-    let [startValue, setStartValue] = useState<number>(0);
-    let [counter, setCounter] = useState<number>(startValue);
-    let [counterStyle, setCounterStyle] = useState<boolean>(false);
-    let [error, setError] = useState<boolean>(false);
-    let [flag, setFlag] = useState<boolean>(false);
-    let [flagMaxValue, setFlagMaxValue] = useState<boolean>(false);
+    let settingsState = useSelector<AppStateType, settingsStateType>(store => store.settings);
+    let displayState = useSelector<AppStateType, displayStateType>(store => store.display);
+    let dispatch = useDispatch();
 
+    const setToLocalStorageHandler =useCallback( () => {
+        localStorage.setItem('startValue', JSON.stringify(settingsState.startValue));
+        localStorage.setItem('maxValue', JSON.stringify(settingsState.maxValue));
+    },[settingsState.startValue,settingsState.maxValue]);
 
-    let [disableSetBtn, setDisableSetBtn] = useState<boolean>(false);
-    let [disableIncBtn, setDisableIncBtn] = useState<boolean>(false);
-    let [disableResetBtn, SetDisableResetBtn] = useState<boolean>(false);
-
-    const setToLocalStorageHandler = () => {
-        localStorage.setItem('startValue', JSON.stringify(startValue));
-        localStorage.setItem('maxValue', JSON.stringify(maxValue));
-    }
     const getFromLocalStorageHandler = () => {
         let valueStartAsString = localStorage.getItem('startValue');
         let valueMaxAsString = localStorage.getItem('maxValue');
         if (valueStartAsString) {
             let newStartValue = JSON.parse(valueStartAsString);
-            setStartValue(newStartValue);
+            dispatch(setStartValueAC(newStartValue));
         }
         if (valueMaxAsString) {
             let newMaxValue = JSON.parse(valueMaxAsString);
-            setMaxValue(newMaxValue);
+            dispatch(setMaxValueAC(newMaxValue));
         }
-    }
+    };
 
-    const onChangeMaxValue = (maxValue: number) => {
-        if (maxValue <= startValue) {
-            setFlagMaxValue(true);
-            setDisableSetBtn(true);
-            setMaxValue(maxValue)
+    const onChangeMaxValue = useCallback((maxValue: number) => {
+        if (maxValue <= settingsState.startValue) {
+            dispatch(setFlagMaxValueAC(true));
+            dispatch(disabledSetBtnAC(true));
+            dispatch(setMaxValueAC(maxValue));
             return
-        } else if (maxValue > startValue) {
-            setFlag(true);
-            setFlagMaxValue(false);
+        } else if (maxValue > settingsState.startValue) {
+            dispatch(setFlagAC(true));
+            dispatch(setFlagMaxValueAC(false));
         }
-        setMaxValue(maxValue)
-        setDisableSetBtn(false);
-    }
-    const onChangeStartValue = (startValue: number) => {
-        if (startValue >= maxValue) {
-            setFlagMaxValue(true);
-            setStartValue(startValue);
-            setDisableSetBtn(true);
+        dispatch(setMaxValueAC(maxValue));
+        dispatch(disabledSetBtnAC(false));
+    }, [dispatch,settingsState.startValue]);
+
+    const onChangeStartValue = useCallback((startValue: number) => {
+        if (startValue >= settingsState.maxValue) {
+            dispatch(setFlagMaxValueAC(true));
+            dispatch(setStartValueAC(startValue));
+            dispatch(disabledSetBtnAC(true));
             return
         } else {
-            setFlagMaxValue(false);
+            dispatch(setFlagMaxValueAC(false));
         }
         if (startValue < 0) {
-            setError(true);
-            setFlagMaxValue(true);
-            setStartValue(startValue);
-            setDisableSetBtn(true);
+            dispatch(setErrorAC(true));
+            dispatch(setFlagMaxValueAC(true));
+            dispatch(setStartValueAC(startValue));
+            dispatch(disabledSetBtnAC(true));
             return
         } else if (startValue >= 0) {
-            if (!error) {
-                setStartValue(startValue);
-                setDisableSetBtn(false);
+            if (!settingsState.error) {
+                dispatch(setStartValueAC(startValue));
+                dispatch(disabledSetBtnAC(false));
                 return
             }
-            setError(false);
+            dispatch(setErrorAC(false));
         }
-        setStartValue(startValue);
-        setDisableSetBtn(false);
-    }
+        dispatch(setStartValueAC(startValue));
+        dispatch(disabledSetBtnAC(false));
+    }, [dispatch,settingsState.maxValue, settingsState.error])
 
-    const onClickSetBtn = () => {
+    const onClickSetBtn = useCallback(() => {
         setToLocalStorageHandler();
-        setFlag(false);
-        setFlagMaxValue(false);
-        setDisableSetBtn(true);
-        setCounter(startValue);
-    }
-    const onClickResetBtn = () => {
-        setDisableSetBtn(false);
-        setDisableIncBtn(false);
-        setCounterStyle(false);
-        setCounter(startValue);
-    }
+        dispatch(setFlagAC(false));
+        dispatch(disabledSetBtnAC(true));
+        dispatch(setDisableIncBtnAC(false));
+        dispatch(setDisableResetBtnAC(false));
+        dispatch(setCounterAC(settingsState.startValue));
+    }, [setToLocalStorageHandler,dispatch,settingsState.startValue]);
 
-    const onClickIncBtn = () => {
-        if (counter < maxValue) {
-            counter++;
-            if (counter === maxValue) {
-                setDisableIncBtn(true);
-                setCounterStyle(true);
+    const onClickResetBtn = useCallback(() => {
+        dispatch(disabledSetBtnAC(false));
+        dispatch(setDisableIncBtnAC(true));
+        dispatch(setDisableResetBtnAC(true));
+        dispatch(setCounterStyleAC(false));
+        dispatch(setCounterAC(settingsState.startValue));
+    }, [dispatch,settingsState.startValue]);
+
+    const onClickIncBtn = useCallback(() => {
+        if (displayState.counter < settingsState.maxValue) {
+            let newCounter = displayState.counter + 1;
+            if (newCounter === settingsState.maxValue) {
+                dispatch(setDisableIncBtnAC(true));
+                dispatch(setCounterStyleAC(true));
             } else {
-                setCounterStyle(false)
+                dispatch(setCounterStyleAC(false))
             }
-            setCounter(counter);
+            dispatch(setCounterAC(newCounter));
         }
-    }
-    const onChangeFlag = (flag: boolean) => {
-        setFlag(flag);
-    }
+    }, [dispatch,displayState.counter, settingsState.maxValue]);
+
+    const onChangeFlag = useCallback((flag: boolean) => {
+        dispatch(setFlagAC(flag));
+    }, [dispatch])
 
     useEffect(() => {
-        getFromLocalStorageHandler()
-    },[])
+            getFromLocalStorageHandler();
+    })
     return (
-        <div className="App">
-            <Settings maxValue={maxValue}
-                      error={error}
-                      startValue={startValue}
+        <div className={styles.App}>
+            <Settings maxValue={settingsState.maxValue}
+                      error={settingsState.error}
+                      startValue={settingsState.startValue}
+                      disabledSetBtn={settingsState.disabledSetBtn}
                       onChangeFlag={onChangeFlag}
                       onChangeMaxValue={onChangeMaxValue}
                       onChangeStartValue={onChangeStartValue}
-                      disabledSetBtn={disableSetBtn}
                       onClickSetBtn={onClickSetBtn}
             />
             <Display
-                flag={flag}
-                flagMaxValue={flagMaxValue}
-                counter={counter}
-                counterStyle={counterStyle}
-                disableIncBtn={disableIncBtn}
-                disableResetBtn={disableResetBtn}
+                flag={displayState.flag}
+                flagMaxValue={displayState.flagMaxValue}
+                counter={displayState.counter}
+                counterStyle={displayState.counterStyle}
+                disableIncBtn={displayState.disableIncBtn}
+                disableResetBtn={displayState.disableResetBtn}
                 onClickResetBtn={onClickResetBtn}
                 onClickIncBtn={onClickIncBtn}
             />

@@ -1,20 +1,20 @@
 import React, {ChangeEvent} from 'react';
 
-import './Settings.css';
+import styles from './Settings.module.css';
 import SuperButton from "../SuperButton/SuperButton";
 
 type SettingsPropsType = {
     maxValue: number
     startValue: number
     disabledSetBtn: boolean
-    onChangeFlag: (flag: boolean)=>void
-    onChangeMaxValue: (value: number)=>void
-    onChangeStartValue: (value: number)=>void
+    onChangeFlag: (flag: boolean) => void
+    onChangeMaxValue: (value: number) => void
+    onChangeStartValue: (value: number) => void
     onClickSetBtn: () => void
     error: boolean;
 }
 
-function Settings(props:SettingsPropsType) {
+const Settings = React.memo((props: SettingsPropsType) => {
 
     const onChangeMaxValue = (e: ChangeEvent<HTMLInputElement>) => {
         props.onChangeMaxValue(e.currentTarget.valueAsNumber)
@@ -25,24 +25,25 @@ function Settings(props:SettingsPropsType) {
         props.onChangeFlag(true);
     }
     return (
-        <div className="Settings">
-            <div className={"Wrapper"}>
-                <div className={"Set"}>
+        <div className={styles.Settings}>
+            <div className={styles.Wrapper}>
+                <div className={styles.Set}>
                     <div>
-                        <span className={"max_value"}>max value:</span>
+                        <span className={styles.max_value}>max value:</span>
                         <input type="number" value={props.maxValue} onChange={onChangeMaxValue}/>
                     </div>
                     <div>
-                        <span className={"start_value"}>start value:</span>
-                        <input type="number" className={props.error ? "error" : ""} value={props.startValue} onChange={onChangeStartValue}/>
+                        <span className={styles.start_value}>start value:</span>
+                        <input type="number" className={props.error ? styles.error : ""} value={props.startValue}
+                               onChange={onChangeStartValue}/>
                     </div>
                 </div>
-                <div className={"Button"}>
-                    <SuperButton title={'Set'} disabled={props.disabledSetBtn}  onClickBtn={props.onClickSetBtn}/>
+                <div className={styles.Button}>
+                    <SuperButton title={'Set'} disabled={props.disabledSetBtn} onClickBtn={props.onClickSetBtn}/>
                 </div>
             </div>
         </div>
     );
-}
+})
 
 export default Settings;

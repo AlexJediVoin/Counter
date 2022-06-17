@@ -1,5 +1,5 @@
 import React from 'react';
-import './SuperButton.css';
+import './SuperButton.module.css';
 
 type SuperButtonPropsType = {
     title: string
@@ -7,9 +7,7 @@ type SuperButtonPropsType = {
     onClickBtn: () => void
 }
 
-
-function SuperButton(props: SuperButtonPropsType) {
-
+const  SuperButton = React.memo((props: SuperButtonPropsType) =>{
     const OnClickHandler = () => {
         if (props.title === "Set") {
             props.onClickBtn();
@@ -21,12 +19,12 @@ function SuperButton(props: SuperButtonPropsType) {
             props.onClickBtn();
         }
     }
-
+debugger;
     return (
-        <div className="SuperButton">
+        <div>
             <button disabled={props.disabled} onClick={OnClickHandler}>{props.title}</button>
         </div>
     );
-}
+})
 
 export default SuperButton;
